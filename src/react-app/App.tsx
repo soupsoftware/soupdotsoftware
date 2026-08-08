@@ -44,7 +44,7 @@ function App() {
       <footer id="contact" className="footer">
         <div className="footer-content">
           <p>&copy; 2026 Soup Software. All rights reserved.</p>
-          <p>hello@soup.software</p>
+          <p>info@soup.software</p>
         </div>
       </footer>
     </div>
