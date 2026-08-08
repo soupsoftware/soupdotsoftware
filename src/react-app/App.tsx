@@ -1,66 +1,54 @@
-// src/App.tsx
-
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import cloudflareLogo from "./assets/Cloudflare_Logo.svg";
-import honoLogo from "./assets/hono.svg";
-import "./App.css";
+import './App.css';
 
 function App() {
-	const [count, setCount] = useState(0);
-	const [name, setName] = useState("unknown");
+  return (
+    <div className="app-container">
+      <nav className="navbar">
+        <div className="brand">Soup Software</div>
+        <ul className="nav-links">
+          <li><a href="#services">Services</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
 
-	return (
-		<>
-			<div>
-				<a href="https://vite.dev" target="_blank">
-					<img src={viteLogo} className="logo" alt="Vite logo" />
-				</a>
-				<a href="https://react.dev" target="_blank">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
-				<a href="https://hono.dev/" target="_blank">
-					<img src={honoLogo} className="logo cloudflare" alt="Hono logo" />
-				</a>
-				<a href="https://workers.cloudflare.com/" target="_blank">
-					<img
-						src={cloudflareLogo}
-						className="logo cloudflare"
-						alt="Cloudflare logo"
-					/>
-				</a>
-			</div>
-			<h1>Vite + React + Hono + Cloudflare</h1>
-			<div className="card">
-				<button
-					onClick={() => setCount((count) => count + 1)}
-					aria-label="increment"
-				>
-					count is {count}
-				</button>
-				<p>
-					Edit <code>src/App.tsx</code> and save to test HMR
-				</p>
-			</div>
-			<div className="card">
-				<button
-					onClick={() => {
-						fetch("/api/")
-							.then((res) => res.json() as Promise<{ name: string }>)
-							.then((data) => setName(data.name));
-					}}
-					aria-label="get name"
-				>
-					Name from API is: {name}
-				</button>
-				<p>
-					Edit <code>worker/index.ts</code> to change the name
-				</p>
-			</div>
-			<p className="read-the-docs">Click on the logos to learn more</p>
-		</>
-	);
+      <header className="hero">
+        <h1>Building Scalable Digital Solutions</h1>
+        <p>We engineer responsive web applications and robust cloud architectures to help your business thrive.</p>
+        <button className="cta-button">Get in Touch</button>
+      </header>
+
+      <section id="services" className="services">
+        <h2>Our Expertise</h2>
+        <div className="service-grid">
+          <div className="service-card">
+            <h3>Frontend Engineering</h3>
+            <p>Creating lightning-fast, responsive web applications using React and modern edge networks.</p>
+          </div>
+          <div className="service-card">
+            <h3>Backend Infrastructure</h3>
+            <p>Designing secure, high-performance APIs and data layers to power complex business logic.</p>
+          </div>
+          <div className="service-card">
+            <h3>Cloud Architecture</h3>
+            <p>Deploying highly available, cost-effective hybrid hosting solutions for maximum scalability.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" className="about">
+        <h2>About Us</h2>
+        <p>Based in the Wellington Region, New Zealand, Soup Software is dedicated to delivering clean, maintainable, and highly optimized code. We bridge the gap between complex technical requirements and elegant user experiences.</p>
+      </section>
+
+      <footer id="contact" className="footer">
+        <div className="footer-content">
+          <p>&copy; 2026 Soup Software. All rights reserved.</p>
+          <p>hello@soup.software</p>
+        </div>
+      </footer>
+    </div>
+  );
 }
 
 export default App;
