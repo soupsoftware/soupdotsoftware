@@ -4,8 +4,14 @@ function App() {
   return (
     <div className="app-container">
       <nav className="navbar">
-        <div className="brand">Soup Software</div>
-        <ul className="nav-links">
+        <div className="brand">
+          <img 
+            src="/SS Logo.svg" 
+            alt="SS Logo" 
+            className="h-24 w-auto object-contain" 
+          />
+        </div>
+        <ul className="nav-links text-lg">
           <li><a href="#services">Services</a></li>
           <li><a href="#about">About</a></li>
           <li><a href="#contact">Contact</a></li>
