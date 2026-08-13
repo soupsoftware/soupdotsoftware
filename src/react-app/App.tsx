@@ -1,57 +1,152 @@
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useDarkMode } from './hooks/useDarkMode';
+import { ThemeToggle } from './components/ThemeToggle';
 import './App.css';
 
+type RevealProps = {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+};
+
+function RevealOnScroll({ children, className = '', delay = 0 }: RevealProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`reveal ${isVisible ? 'is-visible' : ''} ${className}`.trim()}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
+
 function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { isDark, setIsDark } = useDarkMode();
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <div className="app-container">
+      <div className="background-glow glow-one" />
+      <div className="background-glow glow-two" />
+
       <nav className="navbar">
         <div className="brand">
-          <img 
-            src="/SS Logo.svg" 
-            alt="SS Logo" 
-            className="h-24 w-auto object-contain" 
+          <img
+            src="/SS Logo.svg"
+            alt="SoUP Software"
+            className="h-22 w-auto object-contain"
           />
         </div>
-        <ul className="nav-links text-lg">
-          <li><a href="#services">Services</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
+
+        <button
+          className="menu-toggle"
+          aria-label="Toggle navigation"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <div className="nav-right">
+          <ul className={`nav-links text-xl ${menuOpen ? 'open' : ''}`}>
+            <li><a href="#services" onClick={closeMenu}>Services</a></li>
+            <li><a href="#about" onClick={closeMenu}>About</a></li>
+            <li><a href="#contact" onClick={closeMenu}>Contact</a></li>
+          </ul>
+          <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
+        </div>
       </nav>
 
       <header className="hero">
-        <h1>Building Scalable Digital Solutions</h1>
-        <p>We engineer responsive web applications and robust cloud architectures to help your business thrive.</p>
-        <button className="cta-button">Get in Touch</button>
+        <RevealOnScroll className="hero-content" delay={80}>
+          <h1 className="text-4xl">Your partner in <br/><span className="text-transparent [-webkit-text-stroke:2.5px_#00ce93]">digital innovation</span>.</h1>
+          <div className="hero-actions">
+            <a href="#contact" className="cta-button">Get in Touch</a>
+            <a href="#services" className="secondary-link">Explore Services</a>
+          </div>
+        </RevealOnScroll>
+
+        <RevealOnScroll className="hero-visual" delay={140}>
+          <div className="mockup-shell">
+            <div className="mockup-toolbar">
+              <span className="dot dot-one" />
+              <span className="dot dot-two" />
+              <span className="dot dot-three" />
+            </div>
+            <div className="mockup-body">
+              <div className="mockup-sidebar" />
+              <div className="mockup-main">
+                <div className="mockup-panel hero-panel" />
+                <div className="mockup-panel stack-panel" />
+                <div className="mockup-panel chart-panel" />
+              </div>
+            </div>
+          </div>
+        </RevealOnScroll>
       </header>
 
       <section id="services" className="services">
-        <h2>Our Expertise</h2>
+        <RevealOnScroll className="section-heading" delay={40}>
+          <span className="section-tag">What we do</span>
+          <h2>Our Expertise</h2>
+        </RevealOnScroll>
         <div className="service-grid">
-          <div className="service-card">
+          <RevealOnScroll className="service-card" delay={70}>
+            <span className="service-index">01</span>
             <h3>Frontend Engineering</h3>
             <p>Creating lightning-fast, responsive web applications using React and modern edge networks.</p>
-          </div>
-          <div className="service-card">
+          </RevealOnScroll>
+          <RevealOnScroll className="service-card" delay={110}>
+            <span className="service-index">02</span>
             <h3>Backend Infrastructure</h3>
             <p>Designing secure, high-performance APIs and data layers to power complex business logic.</p>
-          </div>
-          <div className="service-card">
+          </RevealOnScroll>
+          <RevealOnScroll className="service-card" delay={150}>
+            <span className="service-index">03</span>
             <h3>Cloud Architecture</h3>
             <p>Deploying highly available, cost-effective hybrid hosting solutions for maximum scalability.</p>
-          </div>
+          </RevealOnScroll>
         </div>
       </section>
 
       <section id="about" className="about">
-        <h2>About Us</h2>
-        <p>Based in the Wellington Region, New Zealand, Soup Software is dedicated to delivering clean, maintainable, and highly optimized code. We bridge the gap between complex technical requirements and elegant user experiences.</p>
+        <RevealOnScroll delay={80}>
+          <h2>About Us</h2>
+          <p>We are dedicated to enabling our clients to be catalysts for positive change and continuous innovation by creating meaningful experiences through thoughtful attention to detail.</p>
+        </RevealOnScroll>
       </section>
 
       <footer id="contact" className="footer">
-        <div className="footer-content">
+        <RevealOnScroll className="footer-content" delay={60}>
           <p>&copy; 2026 Soup Software. All rights reserved.</p>
-          <p>info@soup.software</p>
-        </div>
+          <a href="mailto:info@soup.software">info@soup.software</a>
+        </RevealOnScroll>
       </footer>
     </div>
   );
