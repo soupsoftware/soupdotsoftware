@@ -278,7 +278,7 @@ function TopNavigation({ isDark, setIsDark }: TopNavigationProps) {
               </span>
               
               <span className="text-sm md:text-base font-black text-[var(--accent)] leading-none">
-                •
+                ⭕
               </span>
               
               <span className="text-sm md:text-base font-bold uppercase tracking-widest leading-none">
@@ -286,7 +286,7 @@ function TopNavigation({ isDark, setIsDark }: TopNavigationProps) {
               </span>
               
               <span className="text-sm md:text-base font-black text-[var(--accent)] leading-none">
-                •
+                ⭕
               </span>
               
               <span className="text-sm md:text-base font-bold uppercase tracking-widest leading-none">
@@ -294,7 +294,7 @@ function TopNavigation({ isDark, setIsDark }: TopNavigationProps) {
               </span>
               
               <span className="text-sm md:text-base font-black text-[var(--accent)] leading-none">
-                •
+                ⭕
               </span>
             </React.Fragment>
           ))}
