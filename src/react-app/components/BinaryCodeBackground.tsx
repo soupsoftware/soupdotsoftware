@@ -1,27 +1,73 @@
 import { useEffect, useRef } from 'react';
 
 /**
- * BinaryCodeBackground
- *
- * Replaces the old criss-cross dashed grid with scrolling, fading lines of
- * binary code. Lines scroll diagonally down the screen in two crossing
- * families (leaning right and leaning left) so they criss-cross each other,
- * and every line slowly fades in and out on its own sine wave.
+ * Configuration interface for the BinaryCodeBackground.
+ * By exposing these properties, the component is open for extension 
+ * but closed for modification, ensuring high reusability.
  */
+export interface BinaryCodeConfig {
+  /** Multiplier for the number of lines. 1.0 is default, 2.0 is double density. */
+  density?: number;
+  /** Multiplier for the falling speed. 1.0 is default, 0.5 is half speed. */
+  baseSpeed?: number;
+  /** The direction of the falling code. */
+  direction?: 'criss-cross' | 'matrix' | 'matrix-up' | 'diagonal-right' | 'diagonal-left';
+  /** Base opacity for the canvas (0.0 to 1.0). */
+  opacity?: number;
+  /** Custom colors. If omitted, falls back to CSS variables. */
+  colors?: {
+    main?: string;
+    accent?: string;
+    secondary?: string;
+  };
+  /** Typography settings. */
+  typography?: {
+    fontFamily?: string;
+    minSize?: number;
+    maxSize?: number;
+  };
+  /** Minimum and maximum string length. */
+  tailLength?: [number, number];
+  /** Whether the leading character should glow via alpha boosting. */
+  glowEffect?: boolean;
+  /** Rate at which individual characters flip between 0 and 1. 0 disables flipping. */
+  flickerRate?: number;
+  /** Whether the background should speed up when the user scrolls. */
+  scrollReactivity?: boolean;
+  /** Multiplier for the space between characters in a line. 1.0 is default. */
+  charSpacing?: number;
+}
 
-type ColorKind = 'main' | 'accent' | 'blue';
+const DEFAULT_CONFIG: BinaryCodeConfig = {
+  density: 2.0,
+  baseSpeed: 2.0,
+  direction: 'matrix',
+  opacity: 1.0,
+  typography: {
+    fontFamily: "'Space Mono', 'JetBrains Mono', 'Fira Code', 'Roboto Mono', ui-monospace, SFMono-Regular, monospace",
+    minSize: 15,
+    maxSize: 26,
+  },
+  tailLength: [18, 52],
+  glowEffect: true,
+  flickerRate: 1.0,
+  scrollReactivity: true,
+  charSpacing: 1.25,
+};
+
+type ColorKind = 'main' | 'accent' | 'secondary';
 
 interface BinaryLine {
   x: number;
   y: number;
   dx: number;
   dy: number;
-  speed: number; // px / second
-  length: number; // number of characters
+  speed: number;
+  length: number;
   fontSize: number;
-  spacing: number; // px between characters
-  phase: number; // fade oscillation phase offset
-  fadeSpeed: number; // fade oscillation speed (rad / second)
+  spacing: number;
+  phase: number;
+  fadeSpeed: number;
   colorKind: ColorKind;
   chars: string[];
 }
@@ -37,8 +83,25 @@ const hexToRgb = (hex: string) => {
     : { r: 255, g: 255, b: 255 };
 };
 
-export const BinaryCodeBackground: React.FC = () => {
+interface BinaryCodeBackgroundProps {
+  config?: BinaryCodeConfig;
+}
+
+export const BinaryCodeBackground: React.FC<BinaryCodeBackgroundProps> = ({ config: userConfig }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Store the merged config in a ref. 
+  // WHY: This allows the requestAnimationFrame loop to read the latest config 
+  // values instantly without triggering a React re-render or canvas teardown.
+  const configRef = useRef<BinaryCodeConfig>({ ...DEFAULT_CONFIG, ...userConfig });
+
+  useEffect(() => {
+    configRef.current = {
+      ...DEFAULT_CONFIG,
+      ...userConfig,
+      typography: { ...DEFAULT_CONFIG.typography, ...userConfig?.typography },
+    };
+  }, [userConfig]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -52,6 +115,11 @@ export const BinaryCodeBackground: React.FC = () => {
     let lastTime = performance.now();
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
+    // Scroll Tracking Variables
+    let currentScrollY = window.scrollY;
+    let lastScrollY = window.scrollY;
+    let dynamicSpeedMultiplier = 1.0;
+
     const setSize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
@@ -62,13 +130,13 @@ export const BinaryCodeBackground: React.FC = () => {
     setSize();
     window.addEventListener('resize', setSize);
 
-    // Theme-aware colours (re-read when the theme class changes)
     const getColors = () => {
+      const customColors = configRef.current.colors;
       const styles = getComputedStyle(document.documentElement);
       return {
-        main: hexToRgb(styles.getPropertyValue('--text-main').trim() || '#0f172a'),
-        accent: hexToRgb(styles.getPropertyValue('--accent').trim() || '#DC143C'),
-        blue: { r: 59, g: 130, b: 246 },
+        main: hexToRgb(customColors?.main || styles.getPropertyValue('--text-main').trim() || '#0f172a'),
+        accent: hexToRgb(customColors?.accent || styles.getPropertyValue('--accent').trim() || '#DC143C'),
+        secondary: hexToRgb(customColors?.secondary || '#3b82f6'),
       };
     };
     let colors = getColors();
@@ -86,34 +154,64 @@ export const BinaryCodeBackground: React.FC = () => {
     const pickColorKind = (): ColorKind => {
       const roll = Math.random();
       if (roll < 0.12) return 'accent';
-      if (roll < 0.24) return 'blue';
+      if (roll < 0.24) return 'secondary';
       return 'main';
     };
 
     const createRandomChar = () => {
-      // Occasionally insert a space so lines read like "1010 0101 1001"
       if (Math.random() < 0.1) return ' ';
       return Math.random() < 0.5 ? '0' : '1';
     };
 
-    // Diagonal unit direction (45 degrees)
-    const DIR = Math.SQRT1_2;
-
     const createLine = (): BinaryLine => {
-      const family = Math.random() < 0.5 ? 1 : -1; // lean right or lean left
-      const fontSize = rand(15, 26);
-      const length = Math.floor(rand(18, 52));
-      const spacing = fontSize * rand(0.72, 0.9);
+      const cfg = configRef.current;
+      const minSize = cfg.typography?.minSize || 15;
+      const maxSize = cfg.typography?.maxSize || 26;
+      const minTail = cfg.tailLength?.[0] || 18;
+      const maxTail = cfg.tailLength?.[1] || 52;
+      const baseSpeed = cfg.baseSpeed || 1.0;
+      const charSpacing = cfg.charSpacing || 1.0;
+
+      const fontSize = rand(minSize, maxSize);
+      const length = Math.floor(rand(minTail, maxTail));
+      
+      // OPTIMIZATION: Inject the charSpacing configuration variable here
+      const spacing = fontSize * rand(0.72, 0.9) * charSpacing;
       const totalLength = length * spacing;
+      
+      let dx = 0;
+      let dy = 0;
+      const DIR = Math.SQRT1_2; // 45 degree multiplier
+
+      // Determine velocity vectors dynamically based on configuration
+      switch (cfg.direction) {
+        case 'matrix':
+          dx = 0; dy = 1; break;
+        case 'matrix-up':
+          dx = 0; dy = -1; break;
+        case 'diagonal-right':
+          dx = DIR; dy = DIR; break;
+        case 'diagonal-left':
+          dx = -DIR; dy = DIR; break;
+        case 'criss-cross':
+        default:
+          dx = (Math.random() < 0.5 ? 1 : -1) * DIR;
+          dy = DIR;
+          break;
+      }
+      
+      // Spawn positioning logic to ensure lines start off-screen opposite to their vector
       const x = rand(-width * 0.15, width + width * 0.15);
-      const y = -rand(0, height * 0.6) - totalLength * 0.5;
+      const y = dy > 0 
+        ? -rand(0, height * 0.6) - totalLength * 0.5 
+        : height + rand(0, height * 0.6) + totalLength * 0.5;
 
       return {
         x,
         y,
-        dx: family * DIR,
-        dy: DIR,
-        speed: rand(24, 64),
+        dx,
+        dy,
+        speed: rand(24, 64) * baseSpeed,
         length,
         fontSize,
         spacing,
@@ -124,50 +222,80 @@ export const BinaryCodeBackground: React.FC = () => {
       };
     };
 
-    const lineCount = Math.min(48, Math.max(20, Math.round((width * height) / 55000)));
-    const lines: BinaryLine[] = Array.from({ length: lineCount }, createLine);
+    // Calculate line count based on density configuration
+    const calculateLineCount = () => {
+      const density = configRef.current.density || 1.0;
+      return Math.floor(Math.min(48, Math.max(20, Math.round((width * height) / 55000))) * density);
+    };
+    
+    let lines: BinaryLine[] = Array.from({ length: calculateLineCount() }, createLine);
 
     const render = (now: number) => {
+      const cfg = configRef.current;
       const dt = Math.min(0.05, (now - lastTime) / 1000);
       lastTime = now;
       const t = now / 1000;
 
       ctx.clearRect(0, 0, width, height);
 
+      // Scroll Reactivity Math
+      currentScrollY = window.scrollY;
+      const scrollDelta = Math.abs(currentScrollY - lastScrollY);
+      lastScrollY = currentScrollY;
+
+      if (cfg.scrollReactivity) {
+        // Boost multiplier by scroll delta, hard-capped at 5.0 to prevent visual tearing
+        dynamicSpeedMultiplier = Math.min(dynamicSpeedMultiplier + scrollDelta * 0.05, 5.0);
+      }
+      // Smooth decay interpolation (eases back to 1.0)
+      dynamicSpeedMultiplier += (1.0 - dynamicSpeedMultiplier) * 0.05;
+
       const isDark = document.documentElement.classList.contains('dark');
-      const baseAlpha = isDark ? 0.9 : 0.75;
+      const baseAlpha = (isDark ? 0.9 : 0.75) * (cfg.opacity || 1.0);
+
+      // Periodically check if we need to spawn/cull lines due to dynamic density changes
+      const targetLineCount = calculateLineCount();
+      if (lines.length < targetLineCount) lines.push(createLine());
+      else if (lines.length > targetLineCount) lines.pop();
 
       for (const line of lines) {
-        // Scroll the line
-        line.x += line.dx * line.speed * dt;
-        line.y += line.dy * line.speed * dt;
+        // Apply the dynamicSpeedMultiplier to the base velocity vectors
+        line.x += line.dx * line.speed * dt * dynamicSpeedMultiplier;
+        line.y += line.dy * line.speed * dt * dynamicSpeedMultiplier;
 
-        // Fade in-and-out on a slow sine wave
         const fade = (Math.sin(t * line.fadeSpeed + line.phase) + 1) / 2;
         const lineAlpha = baseAlpha * (0.08 + 0.92 * fade);
 
-        // Mutate a digit now and then for a "live code" feel
-        if (Math.random() < 1.5 * dt) {
-          const idx = Math.floor(Math.random() * line.chars.length);
-          line.chars[idx] = createRandomChar();
+        // Matrix effect: randomly flip each character between 0 and 1
+        const flickerRate = cfg.flickerRate !== undefined ? cfg.flickerRate : 2.0;
+        if (flickerRate > 0) {
+          for (let i = 0; i < line.chars.length; i++) {
+            if (Math.random() < flickerRate * dt) {
+              line.chars[i] = line.chars[i] === '0' ? '1' : line.chars[i] === '1' ? '0' : ' ';
+            }
+          }
         }
 
         const color =
-          line.colorKind === 'accent' ? colors.accent : line.colorKind === 'blue' ? colors.blue : colors.main;
-        ctx.font = `${Math.round(line.fontSize)}px 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace`;
+          line.colorKind === 'accent' ? colors.accent : line.colorKind === 'secondary' ? colors.secondary : colors.main;
+        
+        ctx.font = `${Math.round(line.fontSize)}px ${cfg.typography?.fontFamily}`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
         const totalLength = line.length * line.spacing;
-
-        // Respawn once the whole line has left the screen
         const tailX = line.x - line.dx * totalLength;
         const tailY = line.y - line.dy * totalLength;
-        const offBottom = tailY > height + 80;
-        const offTop = line.y < -80 && tailY < -80;
-        const offRight = line.x > width + 80 && tailX > width + 80;
-        const offLeft = line.x < -80 && tailX < -80;
-        if (offBottom || offTop || offRight || offLeft) {
+        
+        let isOffScreen = false;
+
+        // Dynamic Culling Logic: Capable of handling any directional vector
+        if (line.dy > 0 && tailY > height + 80) isOffScreen = true;
+        else if (line.dy < 0 && tailY < -80) isOffScreen = true;
+        else if (line.dx > 0 && tailX > width + 80) isOffScreen = true;
+        else if (line.dx < 0 && tailX < -80) isOffScreen = true;
+
+        if (isOffScreen) {
           Object.assign(line, createLine());
           continue;
         }
@@ -181,8 +309,7 @@ export const BinaryCodeBackground: React.FC = () => {
           const charAlpha = lineAlpha * tailFade;
           if (charAlpha <= 0.005) continue;
 
-          // We simulate the "glow" of the leading character by boosting its alpha to 1.0
-          const finalAlpha = i === 0 ? 1 : charAlpha;
+          const finalAlpha = (i === 0 && cfg.glowEffect) ? 1 : charAlpha;
 
           ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${finalAlpha})`;
           ctx.fillText(line.chars[i], ix, iy);
@@ -204,9 +331,8 @@ export const BinaryCodeBackground: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-0 pointer-events-none"
-      style={{ opacity: 1 }}
+      className="fixed inset-0 w-full h-full z-0 pointer-events-none"
+      style={{ opacity: 0.2 }}
     />
   );
 };
-

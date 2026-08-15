@@ -207,22 +207,29 @@ function App() {
             </div>
           </div>
         </section>
-      </main>
-
-      <footer id="contact" className="py-24 px-4 lg:px-24 relative z-20">
-        <div className="flex flex-col lg:flex-row items-start lg:items-end gap-12 border-b border-[var(--border-soft)] pb-16">
+        <div className="flex justify-center items-center border-b border-[var(--border-soft)] pb-32">
           <MagneticButton href="mailto:info@soup.software" className="w-48 h-48 md:w-64 md:h-64 rounded-full bg-[var(--text-main)] text-[var(--bg-color)] text-xl md:text-2xl font-bold tracking-tight uppercase hover:bg-[var(--accent)] hover:text-white transition-colors duration-500">
             Let's Go
           </MagneticButton>
         </div>
-        <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-center text-sm font-medium text-[var(--text-muted)] uppercase tracking-widest gap-4">
-          <div className="flex gap-8">
+      </main>
+
+      <footer id="contact" className="pt-8 pb-24 px-4 lg:px-24 relative z-20">
+        {/* SPACER */}
+        <div className="h-4 relative z-10 w-full" />
+
+        <div className="mt-8 flex flex-col lg:flex-row flex-wrap justify-center lg:justify-between items-center text-center text-sm font-medium text-[var(--text-muted)] uppercase tracking-widest gap-4">
+          <div className="flex gap-8 justify-center">
             <a href="#" className="hover:text-[var(--text-main)] transition-colors cursor-hover">Twitter</a>
             <a href="#" className="hover:text-[var(--text-main)] transition-colors cursor-hover">LinkedIn</a>
             <a href="#" className="hover:text-[var(--text-main)] transition-colors cursor-hover">GitHub</a>
           </div>
-          <p>&copy; {new Date().getFullYear()} S<span className="lowercase">o</span>UP Software Limited. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} S<span className="lowercase">o</span>UP Software Limited.</p>
         </div>
+        
+        {/* SPACER */}
+        <div className="h-4 relative z-10 w-full" />
+
       </footer>
     </div>
     </>
