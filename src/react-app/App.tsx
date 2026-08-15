@@ -44,7 +44,7 @@ function App() {
     <>
       {/* Initial Loading Screen / Intro Animation */}
       <motion.div 
-        className="fixed inset-0 z-[100] bg-[var(--text-main)] flex items-center justify-center pointer-events-none"
+        className="fixed inset-0 z-[100] bg-[var(--bg-color)] flex items-center justify-center pointer-events-none"
         initial={{ y: 0 }}
         animate={{ y: "-100%" }}
         transition={{ duration: 1, delay: 1, ease: [0.76, 0, 0.24, 1] }}
@@ -53,7 +53,7 @@ function App() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-[var(--bg-color)] text-4xl md:text-6xl font-black tracking-tighter"
+          className="text-[var(--text-main)] text-4xl md:text-6xl font-black tracking-tighter"
         >
           <span className="text-[var(--accent)]">SoUP</span>SOFTWARE
         </motion.div>
