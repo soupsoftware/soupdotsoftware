@@ -114,7 +114,7 @@ function App() {
                 transition={{ duration: 1.2, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase text-transparent [-webkit-text-stroke:2px_var(--text-main)] dark:[-webkit-text-stroke:2px_var(--text-main)]"
               >
-                Digital
+                D1g1t4l
               </motion.h1>
             </div>
             <div className="overflow-hidden">
@@ -124,7 +124,7 @@ function App() {
                 transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase flex items-center gap-6"
               >
-                <span className="text-[var(--accent)]">Innovation</span>
+                <span className="text-[var(--accent)]">1nn0v4t10n</span>
               </motion.h1>
             </div>
             <div className="overflow-hidden">
@@ -259,47 +259,6 @@ function TopNavigation({ isDark, setIsDark }: TopNavigationProps) {
           <a></a>
         </div>
       </nav>
-
-      {/* 
-        Marquee Ticker Section
-        Attached directly below the nav via the parent's Flexbox column flow.
-        Typography is scaled down to a modern ticker size to fit the streamlined 3rem (h-12) height.
-      */}
-      <div className="w-full h-6 overflow-hidden bg-[var(--text-main)] text-[var(--bg-color)] relative flex items-center border-b border-[var(--text-main)]/10">
-        <motion.div 
-          animate={{ x: ["0%", "-50%"] }} 
-          transition={{ duration: 60, ease: "linear", repeat: Infinity }}
-          className="flex items-center whitespace-nowrap gap-6 w-fit px-4"
-        >
-          {[...Array(16)].map((_, i) => (
-            <React.Fragment key={i}>
-              <span className="text-sm md:text-base font-bold uppercase tracking-widest leading-none">
-                Analytics and Automation
-              </span>
-              
-              <span className="text-sm md:text-base font-black text-[var(--accent)] leading-none">
-                ⭕
-              </span>
-              
-              <span className="text-sm md:text-base font-bold uppercase tracking-widest leading-none">
-                Web and App Development
-              </span>
-              
-              <span className="text-sm md:text-base font-black text-[var(--accent)] leading-none">
-                ⭕
-              </span>
-              
-              <span className="text-sm md:text-base font-bold uppercase tracking-widest leading-none">
-                QA and DevOps
-              </span>
-              
-              <span className="text-sm md:text-base font-black text-[var(--accent)] leading-none">
-                ⭕
-              </span>
-            </React.Fragment>
-          ))}
-        </motion.div>
-      </div>
     </header>
   );
 }
