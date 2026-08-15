@@ -177,16 +177,14 @@ export const BinaryCodeBackground: React.FC = () => {
           const iy = line.y - line.dy * line.spacing * i;
           if (ix < -60 || ix > width + 60 || iy < -60 || iy > height + 60) continue;
 
-          // Brighter near the head, gently fading toward the tail
           const tailFade = 1 - (i / line.length) * 0.8;
           const charAlpha = lineAlpha * tailFade;
           if (charAlpha <= 0.005) continue;
 
-          // Soft glow on the leading character so each stream reads clearly
-          ctx.shadowBlur = i === 0 ? 12 : 0;
-          ctx.shadowColor = `rgba(${color.r}, ${color.g}, ${color.b}, 0.8)`;
+          // We simulate the "glow" of the leading character by boosting its alpha to 1.0
+          const finalAlpha = i === 0 ? 1 : charAlpha;
 
-          ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${charAlpha})`;
+          ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${finalAlpha})`;
           ctx.fillText(line.chars[i], ix, iy);
         }
       }

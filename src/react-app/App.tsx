@@ -55,22 +55,14 @@ function App() {
 
       {/* Particle Wave Background */}
       <ParticleBackground/>
-           
-      <motion.div 
-        className="fixed top-1/4 -left-32 w-[40rem] h-[40rem] rounded-full bg-[var(--accent)] mix-blend-normal dark:mix-blend-screen filter blur-[100px] z-0 pointer-events-none"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: isDark ? [0.3, 0.6, 0.3] : [0.6, 0.9, 0.6],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          
+      <div 
+        className="fixed top-1/4 -left-32 w-[40rem] h-[40rem] rounded-full bg-[var(--accent)] mix-blend-normal dark:mix-blend-screen filter blur-[100px] z-0 pointer-events-none transition-opacity duration-1000"
+        style={{ opacity: isDark ? 0.3 : 0.6 }}
       />
-      <motion.div 
-        className="fixed bottom-1/4 -right-32 w-[45rem] h-[45rem] rounded-full bg-blue-500 mix-blend-normal dark:mix-blend-screen filter blur-[120px] z-0 pointer-events-none"
-        animate={{
-          scale: [1, 1.4, 1],
-          opacity: isDark ? [0.2, 0.5, 0.2] : [0.5, 0.8, 0.5],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      <div 
+        className="fixed bottom-1/4 -right-32 w-[45rem] h-[45rem] rounded-full bg-blue-500 mix-blend-normal dark:mix-blend-screen filter blur-[120px] z-0 pointer-events-none transition-opacity duration-1000"
+        style={{ opacity: isDark ? 0.2 : 0.5 }}
       />
 
       <nav className="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-50 text-[var(--text-main)] bg-[var(--bg-color)]/50 backdrop-blur-md border-b border-[var(--border-soft)]">

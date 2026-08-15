@@ -17,16 +17,15 @@ export const ParticleBackground: React.FC = () => {
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = width;
-      canvas.height = height; // extra height for particles to move off-screen
+      canvas.height = height;
     };
     setSize();
-    window.addEventListener('resize', setSize);
 
-    // Particle settings
     const SEPARATION = 40;
-    const AMOUNTX = 70;
-    const AMOUNTY = 50;
-    
+    const isMobile = width < 768;
+    const AMOUNTX = isMobile ? 35 : 70; // Half density on mobile
+    const AMOUNTY = isMobile ? 30 : 50;
+
     const particles: { ix: number; iy: number; x: number; z: number; y: number }[] = [];
     for (let ix = 0; ix < AMOUNTX; ix++) {
       for (let iy = 0; iy < AMOUNTY; iy++) {
