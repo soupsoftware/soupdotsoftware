@@ -2,10 +2,27 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/SS Logo.svg" />
+		<link rel="icon" type="image/svg+xml" href="/SS Icon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>SoUP Software</title>
-	</head>
+        <title>SoUP</title>
+
+        <script>
+            (function() {
+                const path = window.location.pathname.replace(/^\/|\/$/g, '');
+                let pageName = 'Home';
+
+                if (path) {
+                    const segment = path.split('/').pop().replace(/\.html$/, '');
+                    pageName = segment
+                        .split('-')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ');
+                }
+
+                document.title = `SoUP  |  ${pageName} | Your Digital Innovation Partner`;
+            })();
+        </script>
+    </head>
 
 	<body>
 		<div id="root"></div>
