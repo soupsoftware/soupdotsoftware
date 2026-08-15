@@ -1,154 +1,275 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
+import { motion, useScroll, useTransform, useSpring} from 'framer-motion';
 import { useDarkMode } from './hooks/useDarkMode';
 import { ThemeToggle } from './components/ThemeToggle';
+import { CustomCursor } from './components/CustomCursor';
+import { MagneticButton } from './components/MagneticButton';
+import { ParticleBackground } from './components/ParticleBackground';
+import { BinaryCodeBackground } from './components/BinaryCodeBackground';
+import { ArrowRight } from 'lucide-react';
+import { AnimatedBot, AnimatedMonitorSmartphone, AnimatedShieldCheck } from './components/AnimatedIcons';
 import './App.css';
 
-type RevealProps = {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-};
-
-function RevealOnScroll({ children, className = '', delay = 0 }: RevealProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      className={`reveal ${isVisible ? 'is-visible' : ''} ${className}`.trim()}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-}
-
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const { isDark, setIsDark } = useDarkMode();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const closeMenu = () => setMenuOpen(false);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const smoothScrollYProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  // Parallax for hero
+  const heroY = useTransform(smoothScrollYProgress, [0, 1], ["0%", "50%"]);
+  const heroOpacity = useTransform(smoothScrollYProgress, [0, 0.2], [1, 0]);
 
   return (
-    <div className="app-container">
-      <div className="background-glow glow-one" />
-      <div className="background-glow glow-two" />
-
-      <nav className="navbar">
-        <div className="brand">
-          <img
-            src="/SS Logo.svg"
-            alt="SoUP Software"
-            className="h-22 w-auto object-contain"
-          />
-        </div>
-
-        <button
-          className="menu-toggle"
-          aria-label="Toggle navigation"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
+    <>
+      <motion.div 
+        className="fixed inset-0 z-[100] bg-[var(--text-main)] flex items-center justify-center pointer-events-none"
+        initial={{ y: 0 }}
+        animate={{ y: "-100%" }}
+        transition={{ duration: 1, delay: 1, ease: [0.76, 0, 0.24, 1] }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-[var(--bg-color)] text-4xl md:text-6xl font-black tracking-tighter"
         >
-          <span />
-          <span />
-          <span />
-        </button>
+          <span className="text-[var(--accent)]">SoUP</span>SOFTWARE
+        </motion.div>
+      </motion.div>
 
-        <div className="nav-right">
-          <ul className={`nav-links text-xl ${menuOpen ? 'open' : ''}`}>
-            <li><a href="#services" onClick={closeMenu}>Services</a></li>
-            <li><a href="#about" onClick={closeMenu}>About</a></li>
-            <li><a href="#contact" onClick={closeMenu}>Contact</a></li>
+      <div ref={containerRef} className="app-container bg-[var(--bg-color)] text-[var(--text-main)] min-h-[200vh] relative overflow-hidden transition-colors duration-700 selection:bg-[var(--accent)] selection:text-white">
+      <CustomCursor />
+
+      {/* Animated Criss-Cross Scrolling Binary Code Background */}
+      <BinaryCodeBackground />
+
+      {/* Particle Wave Background */}
+      <ParticleBackground/>
+           
+      <motion.div 
+        className="fixed top-1/4 -left-32 w-[40rem] h-[40rem] rounded-full bg-[var(--accent)] mix-blend-normal dark:mix-blend-screen filter blur-[100px] z-0 pointer-events-none"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: isDark ? [0.3, 0.6, 0.3] : [0.6, 0.9, 0.6],
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div 
+        className="fixed bottom-1/4 -right-32 w-[45rem] h-[45rem] rounded-full bg-blue-500 mix-blend-normal dark:mix-blend-screen filter blur-[120px] z-0 pointer-events-none"
+        animate={{
+          scale: [1, 1.4, 1],
+          opacity: isDark ? [0.2, 0.5, 0.2] : [0.5, 0.8, 0.5],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      />
+
+      <nav className="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-50 text-[var(--text-main)] bg-[var(--bg-color)]/50 backdrop-blur-md border-b border-[var(--border-soft)]">
+        <div className="font-bold text-2xl tracking-tighter uppercase cursor-hover">
+          <span className="text-[var(--accent)]">S<span className="lowercase">o</span>UP</span>SOFTWARE
+        </div>
+        
+        <div className="flex items-center gap-6">
+          <ul className="hidden md:flex gap-8 text-sm font-medium tracking-widest uppercase">
+            <li><a href="#services" className="hover:text-[var(--accent)] transition-colors cursor-hover">Services</a></li>
+            <li><a href="#about" className="hover:text-[var(--accent)] transition-colors cursor-hover">About</a></li>
+            <li><a href="#contact" className="hover:text-[var(--accent)] transition-colors cursor-hover">Contact</a></li>
           </ul>
-          <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
+          <div className="cursor-hover pointer-events-auto">
+            <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
+          </div>
         </div>
       </nav>
 
-      <header className="hero">
-        <RevealOnScroll className="hero-content" delay={80}>
-          <h1 className="text-4xl">Your partner in <br/><span className="text-transparent [-webkit-text-stroke:2.5px_#00ce93]">digital innovation</span>.</h1>
-          <div className="hero-actions">
-            <a href="#contact" className="cta-button">Get in Touch</a>
-            <a href="#services" className="secondary-link">Explore Services</a>
+      <main className="relative z-10 w-full pt-32">
+        {/* HERO SECTION */}
+        <motion.section 
+          className="h-[95vh] flex flex-col justify-center px-4 md:px-12 lg:px-24 relative"
+          style={{ y: heroY, opacity: heroOpacity }}
+        >
+          <div className="overflow-hidden">
+            <motion.h1 
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase"
+            >
+              Your
+            </motion.h1>
           </div>
-        </RevealOnScroll>
+          <div className="overflow-hidden flex items-center gap-4">
+            <motion.h1 
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.2, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase text-transparent [-webkit-text-stroke:2px_var(--text-main)] dark:[-webkit-text-stroke:2px_var(--text-main)]"
+            >
+              Digital
+            </motion.h1>
+          </div>
+          <div className="overflow-hidden">
+             <motion.h1 
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase flex items-center gap-4"
+            >
+              <span className="text-[var(--accent)]">Innovation</span>
+            </motion.h1>
+          </div>
+          <div className="overflow-hidden">
+            <motion.h1 
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase"
+            >
+              Partner
+            </motion.h1>
+          </div>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className="max-w-2xl mt-12 text-lg md:text-2xl font-light text-[var(--text-muted)]"
+          >
+          </motion.p>
+        </motion.section>
 
-        <RevealOnScroll className="hero-visual" delay={140}>
-          <div className="mockup-shell">
-            <div className="mockup-toolbar">
-              <span className="dot dot-one" />
-              <span className="dot dot-two" />
-              <span className="dot dot-three" />
-            </div>
-            <div className="mockup-body">
-              <div className="mockup-sidebar" />
-              <div className="mockup-main">
-                <div className="mockup-panel hero-panel" />
-                <div className="mockup-panel stack-panel" />
-                <div className="mockup-panel chart-panel" />
-              </div>
+        {/* MARQUEE SECTION */}
+        <section className="py-24 md:py-32 overflow-hidden bg-[var(--text-main)] text-[var(--bg-color)] -skew-y-3 relative z-20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] my-12">
+          <div className="skew-y-3">
+            <motion.div 
+              animate={{ x: ["0%", "-50%"] }} 
+              transition={{ duration: 50, ease: "linear", repeat: Infinity }}
+              className="flex whitespace-nowrap gap-12 mb-4 w-fit"
+            >
+              {[...Array(8)].map((_, i) => (
+                <h2 key={i} className="text-6xl md:text-6xl lg:text-[6rem] font-black uppercase tracking-tighter leading-none">
+                  Analytics and Automation <span className="text-[var(--accent)]">•</span>
+                </h2>
+              ))}
+            </motion.div>
+            <motion.div 
+              animate={{ x: ["-50%", "0%"] }} 
+              transition={{ duration: 50, ease: "linear", repeat: Infinity }}
+              className="flex whitespace-nowrap gap-12 text-transparent [-webkit-text-stroke:2px_var(--bg-color)] w-fit"
+            >
+              {[...Array(8)].map((_, i) => (
+                <h2 key={i} className="text-6xl md:text-6xl lg:text-[6rem] font-black uppercase tracking-tighter leading-none">
+                  Web and App Development <span className="text-[var(--accent)]">•</span>
+                </h2>
+              ))}
+            </motion.div>
+            <motion.div 
+              animate={{ x: ["0%", "-50%"] }} 
+              transition={{ duration: 50, ease: "linear", repeat: Infinity }}
+              className="flex whitespace-nowrap gap-12 mb-4 w-fit"
+            >
+              {[...Array(8)].map((_, i) => (
+                <h2 key={i} className="text-6xl md:text-6xl lg:text-[6rem] font-black uppercase tracking-tighter leading-none">
+                  QA and DevOps <span className="text-[var(--accent)]">•</span>
+                </h2>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+        <div className="h-24"><br/></div>
+
+        {/* SPACER */}
+        <div className="h-52 relative z-10 w-full" />
+
+        {/* SERVICES */}
+        <section id="services" className="overlap-section">
+          {/* Overlapping Grid Layout */}
+          <div className="overlap-grid-container">
+            <div className="overlap-grid">
+              <OverlapCard 
+                title="" 
+                desc="Analytics, Automation and Predictive Insights."
+                icon={<AnimatedBot />}
+                delay={0.1}
+              />
+              <OverlapCard 
+                title="" 
+                desc="Web, Desktop and Mobile App Development."
+                icon={<AnimatedMonitorSmartphone />}
+                delay={0.3}
+              />
+              <OverlapCard 
+                title="" 
+                desc="Quality Assurance and Development Operations."
+                icon={<AnimatedShieldCheck />}
+                delay={0.5}
+              />
             </div>
           </div>
-        </RevealOnScroll>
-      </header>
+        </section>
+      </main>
 
-      <section id="services" className="services">
-        <RevealOnScroll className="section-heading" delay={40}>
-          <span className="section-tag">What we do</span>
-          <h2>Our Expertise</h2>
-        </RevealOnScroll>
-        <div className="service-grid">
-          <RevealOnScroll className="service-card" delay={70}>
-            <span className="service-index">01</span>
-            <h3>Frontend Engineering</h3>
-            <p>Creating lightning-fast, responsive web applications using React and modern edge networks.</p>
-          </RevealOnScroll>
-          <RevealOnScroll className="service-card" delay={110}>
-            <span className="service-index">02</span>
-            <h3>Backend Infrastructure</h3>
-            <p>Designing secure, high-performance APIs and data layers to power complex business logic.</p>
-          </RevealOnScroll>
-          <RevealOnScroll className="service-card" delay={150}>
-            <span className="service-index">03</span>
-            <h3>Cloud Architecture</h3>
-            <p>Deploying highly available, cost-effective hybrid hosting solutions for maximum scalability.</p>
-          </RevealOnScroll>
+      <footer id="contact" className="py-24 px-4 lg:px-24 relative z-20">
+        <div className="flex flex-col lg:flex-row items-start lg:items-end gap-12 border-b border-[var(--border-soft)] pb-16">
+          <MagneticButton href="mailto:info@soup.software" className="w-48 h-48 md:w-64 md:h-64 rounded-full bg-[var(--text-main)] text-[var(--bg-color)] text-xl md:text-2xl font-bold tracking-tight uppercase hover:bg-[var(--accent)] hover:text-white transition-colors duration-500">
+            Let's Go
+          </MagneticButton>
         </div>
-      </section>
-
-      <section id="about" className="about">
-        <RevealOnScroll delay={80}>
-          <h2>About Us</h2>
-          <p>We are dedicated to enabling our clients to be catalysts for positive change and continuous innovation by creating meaningful experiences through thoughtful attention to detail.</p>
-        </RevealOnScroll>
-      </section>
-
-      <footer id="contact" className="footer">
-        <RevealOnScroll className="footer-content" delay={60}>
-          <p>&copy; 2026 Soup Software. All rights reserved.</p>
-          <a href="mailto:info@soup.software">info@soup.software</a>
-        </RevealOnScroll>
+        <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-center text-sm font-medium text-[var(--text-muted)] uppercase tracking-widest gap-4">
+          <div className="flex gap-8">
+            <a href="#" className="hover:text-[var(--text-main)] transition-colors cursor-hover">Twitter</a>
+            <a href="#" className="hover:text-[var(--text-main)] transition-colors cursor-hover">LinkedIn</a>
+            <a href="#" className="hover:text-[var(--text-main)] transition-colors cursor-hover">GitHub</a>
+          </div>
+          <p>&copy; {new Date().getFullYear()} S<span className="lowercase">o</span>UP Software Limited. All rights reserved.</p>
+        </div>
       </footer>
     </div>
+    </>
+  );
+}
+
+interface OverlapCardProps {
+  title: string;
+  desc: string;
+  icon: ReactNode;
+  delay: number;
+}
+
+function OverlapCard({ title, desc, icon, delay }: OverlapCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 100 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <div className="overlap-card cursor-hover">
+        <div className="overlap-icon-box w-200 h-200">
+          {icon}
+        </div>
+
+        <h3 className="overlap-card-title mt-6">
+          {title}
+        </h3>
+        
+        <p className="overlap-card-desc">
+          {desc}
+        </p>
+        
+        <a href="#contact" className="overlap-card-link">
+          Explore <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        </a>
+      </div>
+    </motion.div>
   );
 }
 

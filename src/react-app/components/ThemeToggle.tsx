@@ -19,7 +19,7 @@ export function ThemeToggle({ isDark, setIsDark }: ThemeToggleProps) {
   return (
     <button 
       onClick={() => setIsDark(!isDark)}
-      className="theme-toggle"
+      className="p-2 rounded-full transition-colors hover:bg-black/10 dark:hover:bg-white/10"
       aria-label="Toggle Dark Mode"
       title="Toggle Dark Mode"
     >
