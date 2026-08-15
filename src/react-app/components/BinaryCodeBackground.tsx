@@ -39,7 +39,7 @@ export interface BinaryCodeConfig {
 }
 
 const DEFAULT_CONFIG: BinaryCodeConfig = {
-  density: 2.0,
+  density: 1.0,
   baseSpeed: 2.0,
   direction: 'matrix',
   opacity: 1.0,
