@@ -39,8 +39,8 @@ export interface BinaryCodeConfig {
 }
 
 const DEFAULT_CONFIG: BinaryCodeConfig = {
-  density: 1.0,
-  baseSpeed: 2.0,
+  density: 1.5,
+  baseSpeed: 1.5,
   direction: 'matrix',
   opacity: 1.0,
   typography: {
@@ -118,7 +118,7 @@ export const BinaryCodeBackground: React.FC<BinaryCodeBackgroundProps> = ({ conf
     // Scroll Tracking Variables
     let currentScrollY = window.scrollY;
     let lastScrollY = window.scrollY;
-    let dynamicSpeedMultiplier = 1.0;
+    let dynamicSpeedMultiplier = 0.25;
 
     const setSize = () => {
       width = window.innerWidth;
@@ -245,7 +245,7 @@ export const BinaryCodeBackground: React.FC<BinaryCodeBackgroundProps> = ({ conf
 
       if (cfg.scrollReactivity) {
         // Boost multiplier by scroll delta, hard-capped at 5.0 to prevent visual tearing
-        dynamicSpeedMultiplier = Math.min(dynamicSpeedMultiplier + scrollDelta * 0.05, 5.0);
+        dynamicSpeedMultiplier = Math.min(dynamicSpeedMultiplier + scrollDelta * 0.05, 2.0);
       }
       // Smooth decay interpolation (eases back to 1.0)
       dynamicSpeedMultiplier += (1.0 - dynamicSpeedMultiplier) * 0.05;
