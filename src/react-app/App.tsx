@@ -171,7 +171,7 @@ function App() {
               <div className="overlap-grid">
                 <OverlapCard 
                   title="" 
-                  desc="Analytics, Automation and Predictive Insights."
+                  desc="Automation, Analytics and Predictive Insights."
                   icon={<AnimatedBot />}
                   delay={0.1}
                 />
