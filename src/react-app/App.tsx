@@ -45,17 +45,32 @@ function App() {
       {/* Initial Loading Screen / Intro Animation */}
       <motion.div 
         className="fixed inset-0 z-[100] bg-[var(--bg-color)] flex items-center justify-center pointer-events-none"
-        initial={{ y: 0 }}
-        animate={{ y: "-100%" }}
-        transition={{ duration: 1, delay: 1, ease: [0.76, 0, 0.24, 1] }}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 2, delay: 1, ease: [0.76, 0, 0.24, 1] }}
       >
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-[var(--text-main)] text-4xl md:text-6xl font-black tracking-tighter"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 1, delay: 2 }}
+          className="flex justify-center"
         >
-          <span className="text-[var(--accent)]">SoUP</span>SOFTWARE
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            className="text-[var(--text-main)] text-4xl md:text-6xl font-black tracking-tighter"
+          >
+            <span className="text-[var(--accent)]">SoUP</span>
+          </motion.div>
+          <motion.div
+            initial={{ x: -30, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="text-[var(--text-main)] text-4xl md:text-6xl font-black tracking-tighter"
+          >
+            SOFTWARE
+          </motion.div>
         </motion.div>
       </motion.div>
 
@@ -70,7 +85,14 @@ function App() {
 
         {/* Background Layers */}
         <BinaryCodeBackground />
-        <ParticleBackground/>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 3, delay: 3 }}
+        >
+          <ParticleBackground/>
+        </motion.div>
+        
             
         {/* Accent Ambient Lighting */}
         <div 
@@ -101,7 +123,7 @@ function App() {
               <motion.h1 
                 initial={{ y: "100%", opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1.2, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase"
               >
                 Your
@@ -109,42 +131,34 @@ function App() {
             </div>
             <div className="overflow-hidden flex items-center gap-6">
               <motion.h1 
-                initial={{ y: "100%", opacity: 0 }}
+                initial={{ y: "-100%", opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 1.2, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1.2, delay: 1.8, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase text-transparent [-webkit-text-stroke:2px_var(--text-main)] dark:[-webkit-text-stroke:2px_var(--text-main)]"
               >
-                D1g1t4l
+                D1g1tal
               </motion.h1>
             </div>
             <div className="overflow-hidden">
                <motion.h1 
-                initial={{ y: "100%", opacity: 0 }}
+                initial={{ y: "-100%", opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1.2, delay: 2.1, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase flex items-center gap-6"
               >
-                <span className="text-[var(--accent)]">1nn0v4t10n</span>
+                <span className="text-[var(--accent)]">1nn0vat10n</span>
               </motion.h1>
             </div>
             <div className="overflow-hidden">
               <motion.h1 
-                initial={{ y: "100%", opacity: 0 }}
+                initial={{ y: "-100%", opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1.2, delay: 2.4, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase"
               >
                 Partner
               </motion.h1>
             </div>
-            
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              className="max-w-2xl mt-12 text-lg md:text-2xl font-light text-[var(--text-muted)]"
-            >
-            </motion.p>
           </motion.section>
 
           {/* SPACER */}
@@ -285,23 +299,25 @@ function OverlapCard({ title, desc, icon, delay }: OverlapCardProps) {
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="overlap-card cursor-hover">
-        <div className="overlap-icon-box w-200 h-200">
-          {icon}
-        </div>
+      <a href="#contact" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <div className="overlap-card cursor-hover">
+          <div className="overlap-icon-box w-200 h-200">
+            {icon}
+          </div>
 
-        <h3 className="overlap-card-title mt-6">
-          {title}
-        </h3>
-        
-        <p className="overlap-card-desc">
-          {desc}
-        </p>
-        
-        <a href="#contact" className="overlap-card-link">
-          Explore <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-        </a>
-      </div>
+          <h3 className="overlap-card-title mt-6">
+            {title}
+          </h3>
+          
+          <p className="overlap-card-desc">
+            {desc}
+          </p>
+          
+          <a href="#contact" className="overlap-card-link">
+            Explore <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </a>
+        </div>
+      </a>
     </motion.div>
   );
 }

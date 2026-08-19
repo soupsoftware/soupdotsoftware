@@ -1,31 +1,65 @@
 import { useEffect } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
+/**
+ * CustomCursor Component
+ *
+ * Replaces the native browser cursor with a smooth, physics-based custom cursor.
+ * 
+ * Performance Architecture:
+ * This component utilizes Framer Motion's `useMotionValue` to track state outside 
+ * of the React render cycle. By mutating these values directly in DOM event listeners, 
+ * we guarantee 60fps animations without triggering expensive React tree reconciliations.
+ */
 export function CustomCursor() {
-  // useMotionValue tracks state outside of React's render cycle
+  // --- MOTION VALUES ---
+  // initialized off-screen (-100) to prevent a flash at (0,0) on mount.
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
   const scale = useMotionValue(1);
 
-  // Apply spring physics directly to the motion values
-  const springConfig = { damping: 28, stiffness: 500, mass: 0.5 };
-  const smoothX = useSpring(cursorX, springConfig);
-  const smoothY = useSpring(cursorY, springConfig);
+  // --- SPRING PHYSICS ---
+  // Position Spring: Snappy and responsive to accurately track the user's hand.
+  const positionSpringConfig = { damping: 28, stiffness: 500, mass: 0.5 };
+  const smoothX = useSpring(cursorX, positionSpringConfig);
+  const smoothY = useSpring(cursorY, positionSpringConfig);
+
+  // Scale Spring: Gentler and slower to create a fluid, organic zoom effect.
+  const scaleSpringConfig = { damping: 20, stiffness: 300, mass: 0.2 };
+  const smoothScale = useSpring(scale, scaleSpringConfig);
 
   useEffect(() => {
+    // Cache the hover state to prevent redundant spring recalculations during deep DOM traversal.
+    let isCurrentlyHovering = false;
+
     const updateMousePosition = (e: MouseEvent) => {
-      // Mutate the motion value directly, preventing a re-render
+      // Offset by 16px (half the 32px width/height) to perfectly center the cursor dot.
       cursorX.set(e.clientX - 16);
       cursorY.set(e.clientY - 16);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // Use closest() to reliably detect hover states on complex nested elements
-      const isHoverable = target.closest('a, button, .cursor-hover');
-      scale.set(isHoverable ? 2.5 : 1);
+
+      // Robust interactive element selector.
+      // DOM STRUCTURE WARNING: If the cursor expands when hovering a full card, 
+      // ensure the parent card element is NOT an <a> tag and lacks the .cursor-hover class.
+      const isHoverable = target.closest(
+        'a, button, input, select, textarea, [role="button"], [role="link"], .cursor-hover'
+      );
+
+      // Cast to boolean.
+      const shouldHover = !!isHoverable;
+
+      // Micro-optimization: Only update the motion value if the state has mutated.
+      if (shouldHover !== isCurrentlyHovering) {
+        scale.set(shouldHover ? 2.5 : 1);
+        isCurrentlyHovering = shouldHover;
+      }
     };
 
+    // Use { passive: true } to instruct the browser that we will not call preventDefault().
+    // This allows the browser's compositing thread to scroll the page unhindered.
     window.addEventListener('mousemove', updateMousePosition, { passive: true });
     window.addEventListener('mouseover', handleMouseOver, { passive: true });
 
@@ -42,7 +76,7 @@ export function CustomCursor() {
         backgroundColor: 'white',
         x: smoothX,
         y: smoothY,
-        scale: scale,
+        scale: smoothScale, // Injected the smoothed spring value here
       }}
     />
   );

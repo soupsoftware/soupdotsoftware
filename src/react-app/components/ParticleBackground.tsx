@@ -6,7 +6,11 @@ import React, { useEffect, useRef } from 'react';
  * by separating configuration state from the rendering logic.
  */
 const PARTICLE_CONFIG = {
-  // --- ROTATION SETTINGS ---
+  // --- ANIMATION SETTINGS ---
+  // Controls the frequency of the wave progression over time.
+  // Default is 0.03. Higher values result in a faster, more turbulent wave flow.
+  waveSpeed: 0.015, 
+  
   // Default rotation speed is 0 to match the exact current configuration. 
   // To enable slow horizontal rotation, set this to a small float (e.g., 0.002).
   rotationSpeed: 0.001, 
@@ -21,8 +25,8 @@ const PARTICLE_CONFIG = {
 
   // --- CAMERA & VIEWPORT ---
   cameraZ: 1000,
-  cameraYMultiplier: 0.05, // Controls vertical tilt intensity relative to mouse Y
-  cameraXMultiplier: 0.125, // Controls horizontal shift intensity relative to mouse X
+  cameraYMultiplier: 0, // Controls vertical tilt intensity relative to mouse Y
+  cameraXMultiplier: 0, // Controls horizontal shift intensity relative to mouse X
   
   // --- AESTHETICS ---
   baseParticleRadius: 2.5,
@@ -123,7 +127,7 @@ export const ParticleBackground: React.FC = () => {
       const cameraX = mouseX * PARTICLE_CONFIG.cameraXMultiplier;
 
       // Increment counters for wave animation and horizontal rotation
-      count += 0.03;
+      count += PARTICLE_CONFIG.waveSpeed;
       currentAngle += PARTICLE_CONFIG.rotationSpeed;
       
       // Pre-calculate trigonometric functions for the frame to optimize the loop
@@ -137,7 +141,8 @@ export const ParticleBackground: React.FC = () => {
         const rotatedX = p.x * cosA - p.z * sinA;
         const rotatedZ = p.x * sinA + p.z * cosA;
 
-        // Complex wave math overlapping multiple sine waves for an organic feel
+        // Complex wave math overlapping multiple sine waves for an organic feel.
+        // The 'count' variable acts as the phase input, driving the flow of the waves.
         p.y = 
           (Math.sin((p.ix + count) * 0.3) * 80) +
           (Math.sin((p.iy + count) * 0.5) * 80) +
