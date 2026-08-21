@@ -15,8 +15,9 @@ interface OutlinedTextProps {
  * Performance & Rendering Architecture:
  * WebKit browsers generate "miter spikes" on sharp characters (A, M, V, W) when 
  * using `-webkit-text-stroke`. By explicitly forcing `[stroke-linejoin:round]`, 
- * we override the default miter calculation, ensuring the stroke wraps the 
- * typography smoothly across all devices and rendering engines without visual tearing.
+ * we override the default miter calculation. 
+ * We also utilize `paint-order: stroke fill` to ensure the stroke is drawn behind 
+ * the transparent fill layer, preventing inner bleeding and keeping the letterform legible.
  */
 export const OutlinedText: React.FC<OutlinedTextProps> = ({ 
   children, 
@@ -29,8 +30,8 @@ export const OutlinedText: React.FC<OutlinedTextProps> = ({
       className={`text-transparent ${className}`}
       style={{
         WebkitTextStroke: `${strokeWidth} ${strokeColor}`,
-        // Forces the rendering engine to round acute angles, eliminating spikes.
         strokeLinejoin: 'round', 
+        paintOrder: 'stroke fill',
       }}
     >
       {children}

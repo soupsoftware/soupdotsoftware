@@ -10,7 +10,6 @@ import { OutlinedText } from './components/OutlinedText';
 import { ArrowRight } from 'lucide-react';
 import { AnimatedBot, AnimatedMonitorSmartphone, AnimatedShieldCheck } from './components/AnimatedIcons';
 import './App.css';
-import React from 'react';
 
 /**
  * App Component
@@ -130,18 +129,22 @@ function App() {
                 Your
               </motion.h1>
             </div>
+            
             <div className="overflow-hidden flex items-center gap-6">
               <motion.h1 
                 initial={{ y: "-100%", opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 1.2, delay: 1.8, ease: [0.16, 1, 0.3, 1] }}
-                className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase text-transparent [-webkit-text-stroke:2px_var(--text-main)] dark:[-webkit-text-stroke:2px_var(--text-main)]"
+                // DELETED the conflicting Tailwind text-stroke classes here.
+                // We delegate all stroke logic strictly to our OutlinedText component.
+                className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase"
               >
-                <OutlinedText strokeColor="var(--text-main, white)" strokeWidth="2px">
+                <OutlinedText strokeColor="var(--text-main)" strokeWidth="2px">
                   Digital
                 </OutlinedText>
               </motion.h1>
             </div>
+
             <div className="overflow-hidden">
                <motion.h1 
                 initial={{ y: "-100%", opacity: 0 }}
@@ -249,7 +252,7 @@ interface TopNavigationProps {
  * TopNavigation Component
  * 
  * Adheres to the Single Responsibility Principle by isolating the header layout 
- * (Navigation + Marquee) from the main application flow[cite: 1]. Wrapping both in a fixed 
+ * (Navigation + Marquee) from the main application flow. Wrapping both in a fixed 
  * flex-col header ensures they maintain the exact same spatial context and z-index at the top of the viewport.
  */
 function TopNavigation({ isDark, setIsDark }: TopNavigationProps) {
@@ -292,7 +295,7 @@ interface OverlapCardProps {
  * 
  * A simple, isolated component to render service highlights. This abstraction adheres 
  * to the single-responsibility principle, deferring unnecessary complexity and keeping 
- * the primary App component clean and readable[cite: 1].
+ * the primary App component clean and readable.
  */
 function OverlapCard({ title, desc, icon, delay }: OverlapCardProps) {
   return (
