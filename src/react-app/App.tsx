@@ -62,7 +62,7 @@ function App() {
             transition={{ duration: 1 }}
             className="text-[var(--text-main)] text-4xl md:text-6xl font-black tracking-tighter"
           >
-            <span className="text-[var(--accent)]">SoUP</span>
+            <span className="text-[var(--accent)]">SOUP</span>
           </motion.div>
           <motion.div
             initial={{ x: -30, opacity: 0 }}
@@ -138,7 +138,7 @@ function App() {
                 className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase text-transparent [-webkit-text-stroke:2px_var(--text-main)] dark:[-webkit-text-stroke:2px_var(--text-main)]"
               >
                 <OutlinedText strokeColor="var(--text-main, white)" strokeWidth="2px">
-                  D1G1TAL
+                  Digital
                 </OutlinedText>
               </motion.h1>
             </div>
@@ -149,7 +149,7 @@ function App() {
                 transition={{ duration: 1.2, delay: 2.1, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase flex items-center gap-6"
               >
-                <span className="text-[var(--accent)]">1nn0vat10n</span>
+                <span className="text-[var(--accent)]">Innovation</span>
               </motion.h1>
             </div>
             <div className="overflow-hidden">
@@ -260,7 +260,7 @@ function TopNavigation({ isDark, setIsDark }: TopNavigationProps) {
         <div className="font-bold text-2xl tracking-tighter uppercase cursor-hover">
           <div className="flex gap-6 items-center">
             <a></a>
-            <span><span className="text-[var(--accent)]">S<span className="lowercase">o</span>UP</span>SOFTWARE</span>
+            <span><span className="text-[var(--accent)]">SOUP</span>SOFTWARE</span>
           </div>
         </div>
         
