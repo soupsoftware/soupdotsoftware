@@ -6,6 +6,7 @@ import { CustomCursor } from './components/CustomCursor';
 import { MagneticButton } from './components/MagneticButton';
 import { ParticleBackground } from './components/ParticleBackground';
 import { BinaryCodeBackground } from './components/BinaryCodeBackground';
+import { OutlinedText } from './components/OutlinedText';
 import { ArrowRight } from 'lucide-react';
 import { AnimatedBot, AnimatedMonitorSmartphone, AnimatedShieldCheck } from './components/AnimatedIcons';
 import './App.css';
@@ -136,7 +137,9 @@ function App() {
                 transition={{ duration: 1.2, delay: 1.8, ease: [0.16, 1, 0.3, 1] }}
                 className="text-[14vw] md:text-[11vw] leading-[0.8] font-black tracking-tighter uppercase text-transparent [-webkit-text-stroke:2px_var(--text-main)] dark:[-webkit-text-stroke:2px_var(--text-main)]"
               >
-                D1g1tal
+                <OutlinedText strokeColor="var(--text-main, white)" strokeWidth="2px">
+                  D1G1TAL
+                </OutlinedText>
               </motion.h1>
             </div>
             <div className="overflow-hidden">

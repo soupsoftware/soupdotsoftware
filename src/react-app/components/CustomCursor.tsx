@@ -70,14 +70,30 @@ export function CustomCursor() {
   }, [cursorX, cursorY, scale]);
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
-      style={{
-        backgroundColor: 'white',
-        x: smoothX,
-        y: smoothY,
-        scale: smoothScale, // Injected the smoothed spring value here
-      }}
-    />
+    <>
+      {/* 
+        Enforce no native cursor across the entire application DOM tree.
+        WHY: Browsers force `cursor: pointer` on links and buttons, which overrides standard body inheritance.
+        We wrap this in a media query matching Tailwind's `md` breakpoint (768px) to ensure we don't 
+        accidentally hide the system cursor on viewports where our custom cursor is hidden.
+      */}
+      <style>{`
+        @media (min-width: 768px) {
+          * {
+            cursor: none !important;
+          }
+        }
+      `}</style>
+
+      <motion.div
+        className="fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
+        style={{
+          backgroundColor: 'white',
+          x: smoothX,
+          y: smoothY,
+          scale: smoothScale,
+        }}
+      />
+    </>
   );
 }
